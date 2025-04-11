@@ -153,16 +153,18 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
         Log.d(LIBRARY_NAME, String.format("FFmpegKitFlutterPlugin created %s.", this));
     }
 
-    @SuppressWarnings("deprecation")
-    public static void registerWith(final io.flutter.plugin.common.PluginRegistry.Registrar registrar) {
-        final Context context = (registrar.activity() != null) ? registrar.activity() : registrar.context();
-        if (context == null) {
-            Log.w(LIBRARY_NAME, "FFmpegKitFlutterPlugin can not be registered without a context.");
-            return;
-        }
-        FFmpegKitFlutterPlugin plugin = new FFmpegKitFlutterPlugin();
-        plugin.init(registrar.messenger(), context, registrar.activity(), registrar, null);
-    }
+    // @SuppressWarnings("deprecation")
+    // public static void registerWith(final io.flutter.plugin.common.PluginRegistry.Registrar registrar) {
+        // final Context context = (registrar.activity() != null) ? registrar.activity() : registrar.context();
+        // if (context == null) {
+        //     Log.w(LIBRARY_NAME, "FFmpegKitFlutterPlugin can not be registered without a context.");
+        //     return;
+        // }
+        // FFmpegKitFlutterPlugin plugin = new FFmpegKitFlutterPlugin();
+        // plugin.init(registrar.messenger(), context, registrar.activity(), registrar, null);
+
+
+    // }
 
     protected void registerGlobalCallbacks() {
         FFmpegKitConfig.enableFFmpegSessionCompleteCallback(this::emitSession);
@@ -184,18 +186,36 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
 
     @Override
     public void onAttachedToEngine(@NonNull final FlutterPluginBinding flutterPluginBinding) {
-        this.flutterPluginBinding = flutterPluginBinding;
+    this.flutterPluginBinding = flutterPluginBinding;
+
+    // Get the app context and binary messenger
+    Context context = flutterPluginBinding.getApplicationContext();
+    BinaryMessenger messenger = flutterPluginBinding.getBinaryMessenger();
+
+    // Example: Initialize method channel if needed
+    MethodChannel channel = new MethodChannel(messenger, "ffmpeg_kit_flutter");
+    channel.setMethodCallHandler(new FFmpegMethodHandler(context)); // You must create this class/handler
     }
+
 
     @Override
     public void onDetachedFromEngine(@NonNull final FlutterPluginBinding binding) {
         this.flutterPluginBinding = null;
     }
 
-    @Override
+   @Override
     public void onAttachedToActivity(@NonNull ActivityPluginBinding activityPluginBinding) {
-        Log.d(LIBRARY_NAME, String.format("FFmpegKitFlutterPlugin %s attached to activity %s.", this, activityPluginBinding.getActivity()));
-        init(flutterPluginBinding.getBinaryMessenger(), flutterPluginBinding.getApplicationContext(), activityPluginBinding.getActivity(), null, activityPluginBinding);
+    if (flutterPluginBinding == null) {
+        Log.e(LIBRARY_NAME, "PluginBinding is null! onAttachedToEngine() was not called.");
+        return;
+    }
+
+    Log.d(LIBRARY_NAME, String.format("FFmpegKitFlutterPlugin %s attached to activity %s.", this, activityPluginBinding.getActivity()));
+    init(flutterPluginBinding.getBinaryMessenger(),
+         flutterPluginBinding.getApplicationContext(),
+         activityPluginBinding.getActivity(),
+         null,
+         activityPluginBinding);
     }
 
     @Override
