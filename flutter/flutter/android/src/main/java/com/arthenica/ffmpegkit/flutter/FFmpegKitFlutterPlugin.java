@@ -194,7 +194,7 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
 
     // Example: Initialize method channel if needed
     MethodChannel channel = new MethodChannel(messenger, "ffmpeg_kit_flutter");
-    channel.setMethodCallHandler(new FFmpegMethodHandler(context)); // You must create this class/handler
+    channel.setMethodCallHandler(this); // You must create this class/handler
     }
 
 
@@ -668,7 +668,7 @@ public class FFmpegKitFlutterPlugin implements FlutterPlugin, ActivityAware, Met
     }
 
     @SuppressWarnings("deprecation")
-    protected void init(final BinaryMessenger messenger, final Context context, final Activity activity, final io.flutter.plugin.common.PluginRegistry.Registrar registrar, final ActivityPluginBinding activityBinding) {
+    protected void init(final BinaryMessenger messenger, final Context context, final Activity activity, final ActivityPluginBinding activityBinding) {
         registerGlobalCallbacks();
 
         if (methodChannel == null) {
